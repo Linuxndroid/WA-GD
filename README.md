@@ -14,7 +14,7 @@ Step.3: Google account login credentials (email and password). One Time Need.
 
 Step.1: Extract `WA-GD-master.zip.`
 
-Step.2: Install dependencies: Run `python3 -m pip install -r requirements.txt` from your command Terminal
+Step.2: Install dependencies: Run `python3 install -r requirements.txt` from your command Terminal
 
 Step.3: Edit the `[auth]` section in `settings.cfg` paste Your Email & Password or Android ID
 
