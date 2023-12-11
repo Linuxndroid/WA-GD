@@ -23,7 +23,7 @@ Step.4: Run `python3 WhatsAppGDExtract.py sync` And Get All Your WhatsApp Data.
 # Watch Video For More Information.
 [![YouTube Video](https://img.youtube.com/vi/Hqnalf3fQms/0.jpg)](https://www.youtube.com/watch?v=Hqnalf3fQms)
 
-# Check Out More [Hacking Course](https://shop-linuxndroid.in)
+# Check Out More [Hacking Course](https://linuxndroid.in)
 
 # Disclaimer
 <b>Linuxndroid Provides no warranty with this software and will not be responsible for any direct or indirect damage caused due to the usage of this tool.<br>
