@@ -16,9 +16,11 @@ Step.1: Extract `WA-GD-master.zip.`
 
 Step.2: Install dependencies: Run `python3 install -r requirements.txt` from your command Terminal
 
-Step.3: Edit the `[auth]` section in `settings.cfg` paste Your Email & Password or Android ID
+Step.3: Update Dependencies `pip install gpsoauth && pip install requests==2.23.0`
 
-Step.4: Run `python3 WhatsAppGDExtract.py sync` And Get All Your WhatsApp Data.
+Step.4: Edit the `[auth]` section in `settings.cfg` paste Your Email & Password or Android ID
+
+Step.5: Run `python3 WhatsAppGDExtract.py sync` And Get All Your WhatsApp Data.
 
 # Watch Video For More Information.
 [![YouTube Video](https://img.youtube.com/vi/Hqnalf3fQms/0.jpg)](https://www.youtube.com/watch?v=Hqnalf3fQms)
