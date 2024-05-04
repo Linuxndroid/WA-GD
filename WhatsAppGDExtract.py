@@ -64,33 +64,24 @@ class WaBackup:
     """
     def __init__(self, gmail, password, android_id, oauth_token):
         if oauth_token is None:
-            # Password login
+            # get authentication token via Password login 
             token = gpsoauth.perform_master_login(gmail, password, android_id)
             if "Error" in token:
-                print("ERROR: the account might have MFA enabled, please follow https://github.com/simon-weber/gpsoauth#alternative-flow and add the oauth_token to the config file.")
-            if "Token" not in token:
-                quit(token)
-            self.auth = gpsoauth.perform_oauth(
-                gmail,
-                token["Token"],
-                android_id,
-                "oauth2:https://www.googleapis.com/auth/drive.appdata",
-                "com.whatsapp",
-                "38a0f7d505fe18fec64fbf343ecaaaf310dbd799",
-            )
+                quit(("ERROR: the account might have MFA enabled, please follow https://github.com/simon-weber/gpsoauth#alternative-flow and add the oauth_token to the config file.", token))
         else:
-            # OAUTH token login
-            master_response = gpsoauth.exchange_token(gmail, oauth_token, android_id)
-            if "Token" not in master_response:
-                print("ERROR: the oauth_token you used is either invalid or has expired already.")
-                quit(master_response)
-            master_token = master_response['Token']
-
-            self.auth = gpsoauth.perform_oauth(
-                gmail, master_token, android_id,
-                "oauth2:https://www.googleapis.com/auth/drive.appdata",
-                "com.whatsapp",
-                "38a0f7d505fe18fec64fbf343ecaaaf310dbd799")
+            # get authentication token via OAUTH token login
+            token = gpsoauth.exchange_token(gmail, oauth_token, android_id)
+            if "Error" in token:
+                quit(("ERROR: the oauth_token you used is either invalid or has expired already.", token))
+        # check token presence
+        if "Token" not in token:
+            quit(("ERROR: missing token from first step auth. Exiting.", token))
+        # perform authentication
+        self.auth = gpsoauth.perform_oauth(
+            gmail, token, android_id,
+            "oauth2:https://www.googleapis.com/auth/drive.appdata",
+            "com.whatsapp",
+            "38a0f7d505fe18fec64fbf343ecaaaf310dbd799")
         
     def get(self, path, params=None, **kwargs):
         try:
