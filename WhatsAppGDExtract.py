@@ -58,20 +58,37 @@ def download_file(file, stream):
 class WaBackup:
     """
     Provide access to WhatsApp backups stored in Google drive.
-    """
-    def __init__(self, gmail, password, android_id):
-        token = gpsoauth.perform_master_login(gmail, password, android_id)
-        if "Token" not in token:
-            quit(token)
-        self.auth = gpsoauth.perform_oauth(
-            gmail,
-            token["Token"],
-            android_id,
-            "oauth2:https://www.googleapis.com/auth/drive.appdata",
-            "com.whatsapp",
-            "38a0f7d505fe18fec64fbf343ecaaaf310dbd799",
-        )
 
+    NOTE: if the account has MFA enabled, please follow https://github.com/simon-weber/gpsoauth#alternative-flow
+    then add the oauth_token to the config file
+    """
+    def __init__(self, gmail, password, android_id, oauth_token):
+        if oauth_token is None:
+            # Password login
+            token = gpsoauth.perform_master_login(gmail, password, android_id)
+            if "Error" in token:
+                print("ERROR: the account might have MFA enabled, please follow https://github.com/simon-weber/gpsoauth#alternative-flow and add the oauth_token to the config file")
+            if "Token" not in token:
+                quit(token)
+            self.auth = gpsoauth.perform_oauth(
+                gmail,
+                token["Token"],
+                android_id,
+                "oauth2:https://www.googleapis.com/auth/drive.appdata",
+                "com.whatsapp",
+                "38a0f7d505fe18fec64fbf343ecaaaf310dbd799",
+            )
+        else:
+            # OAUTH token login
+            master_response = gpsoauth.exchange_token(gmail, oauth_token, android_id)
+            master_token = master_response['Token']
+
+            self.auth = gpsoauth.perform_oauth(
+                gmail, master_token, android_id,
+                "oauth2:https://www.googleapis.com/auth/drive.appdata",
+                "com.whatsapp",
+                "38a0f7d505fe18fec64fbf343ecaaaf310dbd799")
+        
     def get(self, path, params=None, **kwargs):
         try:
             response = requests.get(
@@ -164,11 +181,15 @@ def getConfigs():
                 password = getpass("Enter your password for {}: ".format(gmail))
             except KeyboardInterrupt:
                 quit("\nCancelled!")
+        oauth_token = config.get("auth", "oauth_token", fallback=None)
+        if oauth_token is not None:
+            print("IMPORTANT: Using Token %s for OAUTH login, remember it will expire after each usage.")
         android_id = config.get("auth", "android_id")
         return {
             "android_id": android_id,
             "gmail": gmail,
             "password": password,
+            "oauth_token": oauth_token
         }
     except (configparser.NoSectionError, configparser.NoOptionError):
         quit("The 'settings.cfg' file is missing or corrupt!")
@@ -178,11 +199,16 @@ def createSettingsFile():
         cfg.write(dedent("""
             [auth]
             gmail = alias@gmail.com
-            # Optional. The account password or app password when using 2FA.
+
+            # The account password or app password when using 2FA.
             # You will be prompted if omitted.
             password = yourpassword
+            
             # The result of "adb shell settings get secure android_id".
             android_id = 0000000000000000
+            
+            # The OAUTH token for MFA login
+            oauth_token = 0000000000000000
             """).lstrip())
 
 def backup_info(backup):
