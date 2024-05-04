@@ -67,7 +67,7 @@ class WaBackup:
             # Password login
             token = gpsoauth.perform_master_login(gmail, password, android_id)
             if "Error" in token:
-                print("ERROR: the account might have MFA enabled, please follow https://github.com/simon-weber/gpsoauth#alternative-flow and add the oauth_token to the config file")
+                print("ERROR: the account might have MFA enabled, please follow https://github.com/simon-weber/gpsoauth#alternative-flow and add the oauth_token to the config file.")
             if "Token" not in token:
                 quit(token)
             self.auth = gpsoauth.perform_oauth(
@@ -81,6 +81,9 @@ class WaBackup:
         else:
             # OAUTH token login
             master_response = gpsoauth.exchange_token(gmail, oauth_token, android_id)
+            if "Token" not in master_response:
+                print("ERROR: the oauth_token you used is either invalid or has expired already.")
+                quit(master_response)
             master_token = master_response['Token']
 
             self.auth = gpsoauth.perform_oauth(
